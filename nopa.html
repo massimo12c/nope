@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nope</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --bg: #0a0a0a; --card: #151515; --text: #f5f5f5; --text-dim: #888;
+            --green: #22c55e; --red: #ef4444; --blue: #3b82f6; --border: #2a2a2a;
+        }
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg); color: var(--text);
+            width: 100%; min-height: 100vh; overflow-x: hidden;
+        }
+        body { max-width: 100%; margin: 0 auto; }
+       .hidden { display: none!important; }
+
+        /* Onboarding */
+       .onboarding { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+       .onboarding-slide { display: none; animation: fadeIn 0.5s; width: 100%; max-width: 360px; }
+       .onboarding-slide.active { display: block; }
+       .onboarding-icon { font-size: 72px; margin-bottom: 24px; }
+       .onboarding h2 { font-size: 26px; margin-bottom: 12px; }
+       .onboarding p { color: var(--text-dim); font-size: 16px; line-height: 1.5; margin-bottom: 32px; }
+       .onboarding-btn { background: var(--green); color: #000; border: none; padding: 16px; border-radius: 12px; font-size: 17px; font-weight: 600; cursor: pointer; width: 100%; }
+       .onboarding-dots { display: flex; gap: 8px; margin-top: 24px; justify-content: center; }
+       .dot-indicator { width: 8px; height: 8px; border-radius: 50%; background: #333; }
+       .dot-indicator.active { background: var(--green); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* App */
+       .app { padding: 16px 16px 90px 16px; max-width: 430px; margin: 0 auto; }
+       .page { display: none; }
+       .page.active { display: block; animation: fadeIn 0.3s; }
+
+        /* Header */
+       .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+       .logo { display: flex; align-items: center; gap: 10px; font-size: 26px; font-weight: 800; }
+       .logo-svg { width: 30px; height: 30px; }
+       .status { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 6px 12px; border-radius: 20px; color: var(--green); font-size: 13px; font-weight: 600; }
+       .dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* Componenti */
+       .section-title { font-size: 12px; color: var(--text-dim); margin: 20px 0 12px 4px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+       .card { background: var(--card); border: 1px solid var(--border); padding: 16px; border-radius: 16px; margin-bottom: 12px; }
+       .card-flex { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+       .card-info h3 { font-size: 16px; margin-bottom: 4px; }
+       .card-info p { font-size: 13px; color: var(--text-dim); line-height: 1.4; }
+       .stat-big { font-size: 32px; font-weight: 700; margin: 8px 0; }
+       .stat-label { color: var(--text-dim); font-size: 14px; }
+
+        /* Switch */
+       .switch { position: relative; display: inline-block; width: 51px; height: 31px; flex-shrink: 0; }
+       .switch input { opacity: 0; width: 0; height: 0; }
+       .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #333; transition:.3s; border-radius: 31px; }
+       .slider:before { position: absolute; content: ""; height: 27px; width: 27px; left: 2px; bottom: 2px; background: white; transition:.3s; border-radius: 50%; }
+        input:checked +.slider { background: var(--green); }
+        input:checked +.slider:before { transform: translateX(20px); }
+
+        /* Feed */
+       .item { background: var(--card); border: 1px solid var(--border); padding: 14px; border-radius: 12px; margin-bottom: 10px; display: flex; gap: 12px; }
+       .item-icon { width: 36px; height: 36px; background: rgba(239, 68, 68, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+       .item-body strong { display: block; font-size: 15px; margin-bottom: 2px; }
+       .item-body p { font-size: 14px; color: var(--text-dim); margin-bottom: 4px; line-height: 1.4; }
+       .item-body span { font-size: 12px; color: #666; }
+
+        /* Famiglia */
+       .membro { display: flex; align-items: center; gap: 12px; }
+       .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--blue); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; flex-shrink: 0; }
+       .badge { font-size: 12px; padding: 4px 8px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+       .badge-ok { background: rgba(34, 197, 94, 0.15); color: var(--green); }
+       .badge-warn { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+
+        /* Nav */
+       .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 calc(16px + env(safe-area-inset-bottom)); max-width: 430px; margin: 0 auto; }
+       .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; color: var(--text-dim); cursor: pointer; }
+       .nav-item.active { color: var(--green); }
+       .nav-item svg { width: 24px; height: 24px; }
+    </style>
+</head>
+<body>
+    <!-- ONBOARDING -->
+    <div class="onboarding" id="onboarding">
+        <div class="onboarding-slide active">
+            <div class="onboarding-icon">🛡️</div>
+            <h2>Benvenuto su Nope</h2>
+            <p>L’app che protegge te e la tua famiglia dalle truffe online e telefoniche. 24 ore su 24.</p>
+            <button class="onboarding-btn" onclick="prossimaSlide()">Avanti</button>
+        </div>
+        <div class="onboarding-slide">
+            <div class="onboarding-icon">🚫</div>
+            <h2>Blocca le Truffe</h2>
+            <p>Nope analizza chiamate, SMS e link in tempo reale. Se è una truffa, la blocca prima che ti raggiunga.</p>
+            <button class="onboarding-btn" onclick="prossimaSlide()">Avanti</button>
+        </div>
+        <div class="onboarding-slide">
+            <div class="onboarding-icon">👨‍👩‍👧‍👦</div>
+            <h2>Proteggi i Tuoi Cari</h2>
+            <p>Collega i familiari. Se ricevono una chiamata sospetta, tu ricevi un avviso e puoi intervenire.</p>
+            <button class="onboarding-btn" onclick="iniziaApp()">Inizia a Proteggerti</button>
+        </div>
+        <div class="onboarding-dots">
+            <div class="dot-indicator active"></div>
+            <div class="dot-indicator"></div>
+            <div class="dot-indicator"></div>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div class="app hidden" id="app">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="logo">
+                <svg class="logo-svg" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="15" stroke="#22c55e" stroke-width="2"/>
+                    <path d="M10 10L22 22M22 10L10 22" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                Nope
+            </div>
+            <div class="status"><div class="dot"></div>Protetto</div>
+        </div>
+
+        <!-- PAGINA HOME -->
+        <div id="page-home" class="page active">
+            <div class="card">
+                <div class="stat-label">Truffe bloccate oggi</div>
+                <div class="stat-big" id="stat-bloccate">12</div>
+                <div class="stat-label">Sei al sicuro</div>
+            </div>
+            <div class="section-title">Scudo Attivo</div>
+            <div class="card card-flex">
+                <div class="card-info"><h3>Chiamate Sconosciute</h3><p>Blocca i call center e i numeri truffa</p></div>
+                <label class="switch"><input type="checkbox" checked onchange="cambiaStato('chiamate', this.checked)"><span class="slider"></span></label>
+            </div>
+            <div class="card card-flex">
+                <div class="card-info"><h3>SMS Phishing</h3><p>Analizza i link in SMS e WhatsApp</p></div>
+                <label class="switch"><input type="checkbox" checked onchange="cambiaStato('sms', this.checked)"><span class="slider"></span></label>
+            </div>
+            <div class="card card-flex">
+                <div class="card-info"><h3>Protezione Famiglia</h3><p>Avvisa se i tuoi cari sono a rischio</p></div>
+                <label class="switch"><input type="checkbox" checked onchange="cambiaStato('famiglia', this.checked)"><span class="slider"></span></label>
+            </div>
+        </div>
+
+        <!-- PAGINA FEED -->
+        <div id="page-feed" class="page">
+            <div class="section-title">Attività Recente</div>
+            <div id="feed-lista"></div>
+        </div>
+
+        <!-- PAGINA FAMIGLIA -->
+        <div id="page-famiglia" class="page">
+            <div class="section-title">I tuoi cari</div>
+            <div id="lista-famiglia"></div>
+        </div>
+
+        <!-- PAGINA IMPOSTAZIONI -->
+        <div id="page-impostazioni" class="page">
+            <div class="section-title">Impostazioni</div>
+            <div class="card card-flex" onclick="alert('Funzione in arrivo')">
+                <div class="card-info"><h3>Account</h3><p>Gestisci profilo e abbonamento</p></div>
+                <span style="color:var(--text-dim);">›</span>
+            </div>
+            <div class="card card-flex" onclick="alert('Funzione in arrivo')">
+                <div class="card-info"><h3>Notifiche</h3><p>Personalizza gli avvisi</p></div>
+                <span style="color:var(--text-dim);">›</span>
+            </div>
+            <div class="card card-flex" onclick="alert('Funzione in arrivo')">
+                <div class="card-info"><h3>Supporto</h3><p>Hai bisogno di aiuto?</p></div>
+                <span style="color:var(--text-dim);">›</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVIGAZIONE -->
+    <div class="nav hidden" id="nav">
+        <div class="nav-item active" onclick="cambiaPagina('home', this)">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span>Home</span>
+        </div>
+        <div class="nav-item" onclick="cambiaPagina('feed', this)">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            <span>Feed</span>
+        </div>
+        <div class="nav-item" onclick="cambiaPagina('famiglia', this)">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            <span>Famiglia</span>
+        </div>
+        <div class="nav-item" onclick="cambiaPagina('impostazioni', this)">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.42.49.42h4c.25 0.46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0.61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+            <span>Setup</span>
+        </div>
+    </div>
+
+    <script>
+        let stato = {
+            slide: 0,
+            pagina: 'home',
+            protezioni: { chiamate: true, sms: true, famiglia: true },
+            feed: [
+                { tipo: 'blocco', titolo: 'SMS Phishing Bloccato', desc: 'Finto corriere BRT con link pericoloso', tempo: '2 min fa' },
+                { tipo: 'blocco', titolo: 'Chiamata Sconosciuta', desc: 'Numero +39 345... segnalato come truffa', tempo: '15 min fa' },
+                { tipo: 'avviso', titolo: 'Avviso per Papà', desc: 'Ha ricevuto un SMS sospetto da "Poste"', tempo: '1 ora fa' },
+                { tipo: 'blocco', titolo: 'Link WhatsApp Bloccato', desc: 'Falso buono Amazon da contatto non in rubrica', tempo: '3 ore fa' }
+            ],
+            famiglia: []
+        };
+
+        // Onboarding
+        function prossimaSlide() {
+            document.querySelectorAll('.onboarding-slide')[stato.slide].classList.remove('active');
+            document.querySelectorAll('.dot-indicator')[stato.slide].classList.remove('active');
+            stato.slide++;
+            document.querySelectorAll('.onboarding-slide')[stato.slide].classList.add('active');
+            document.querySelectorAll('.dot-indicator')[stato.slide].classList.add('active');
+        }
+        function iniziaApp() {
+            document.getElementById('onboarding').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            document.getElementById('nav').classList.remove('hidden');
+            localStorage.setItem('nopeOnboarding', 'true');
+        }
+
+        // Navigazione
+        function cambiaPagina(pagina, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pagina).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            stato.pagina = pagina;
+            if (pagina === 'feed') renderFeed();
+            if (pagina === 'famiglia') renderFamiglia();
+        }
+
+        // Protezioni
+        function cambiaStato(chiave, valore) {
+            stato.protezioni[chiave] = valore;
+        }
+
+        // Feed
+        function renderFeed() {
+            document.getElementById('feed-lista').innerHTML = stato.feed.map(item => `
+                <div class="item">
+                    <div class="item-icon">${item.tipo === 'blocco'? '🚫' : '⚠️'}</div>
+                    <div class="item-body">
+                        <strong>${item.titolo}</strong>
+                        <p>${item.desc}</p>
+                        <span>${item.tempo}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Famiglia
+        function aggiungiFamiliare() {
+            const nome = prompt("Nome del familiare:");
+            if (!nome) return;
+            const tel = prompt("Numero di telefono:");
+            if (!tel) return;
+            stato.famiglia.push({ nome: nome, tel: tel, rischio: 0 });
+            localStorage.setItem('nopeFamiglia', JSON.stringify(stato.famiglia));
+            renderFamiglia();
+        }
+
+        function renderFamiglia() {
+            const container = document.getElementById('lista-famiglia');
+            if (!stato.famiglia || stato.famiglia.length === 0) {
+                stato.famiglia = [
+                    { nome: "Mamma", tel: "+39 3xx xxx xxxx", rischio: 0 },
+                    { nome: "Papà", tel: "+39 3xx xxx xxxx", rischio: 1 }
+                ];
+            }
+            container.innerHTML = stato.famiglia.map(m => `
+                <div class="card card-flex">
+                    <div class="membro">
+                        <div class="avatar" style="background:${m.rischio > 0? 'var(--red)' : 'var(--blue)'};">${m.nome[0]}</div>
+                        <div><strong>${m.nome}</strong><p style="color:var(--text-dim);font-size:14px;">${m.tel}</p></div>
+                    </div>
+                    <div class="badge ${m.rischio > 0? 'badge-warn' : 'badge-ok'}">${m.rischio > 0? m.rischio + ' rischio' : 'Protetto'}</div>
+                </div>
+            `).join('') + `
+            <div class="card" style="text-align:center; cursor:pointer; border-style:dashed;" onclick="aggiungiFamiliare()">
+                <strong style="color:var(--green);">+ Aggiungi familiare</strong>
+            </div>`;
+        }
+
+        // Home
+        function renderHome() {
+            document.getElementById('stat-bloccate').textContent = stato.feed.filter(f => f.tipo === 'blocco').length;
+        }
+
+        // Init
+        if (localStorage.getItem('nopeOnboarding')) {
+            document.getElementById('onboarding').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            document.getElementById('nav').classList.remove('hidden');
+        }
+        const famigliaSalvata = localStorage.getItem('nopeFamiglia');
+        if (famigliaSalvata) stato.famiglia = JSON.parse(famigliaSalvata);
+        renderHome();
+        renderFamiglia();
+    </script>
+</body>
+</html>
